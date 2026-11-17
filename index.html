@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Калькулятор сэндвич-панелей - демо</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f4;--pap:#fff;--ink:#14202b;--mut:#66727f;--line:#d6dce2;--acc:#e8541d;--acc2:#0f6fb6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Onest,system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+header{display:flex;align-items:center;gap:14px;padding:14px 20px;background:#14202b;color:#fff}
+header b{font-size:17px;letter-spacing:.01em}
+header span{font-size:12px;color:#9fb0c0;border:1px solid #33475a;border-radius:99px;padding:3px 10px}
+.steps{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.steps a{color:#cfdbe6;text-decoration:none;font-size:12.5px;padding:6px 10px;border-radius:8px;background:#1f2f3e}
+.steps a:hover{background:var(--acc)}
+.wrap{display:grid;grid-template-columns:330px 1fr;min-height:calc(100vh - 56px)}
+aside{background:var(--pap);border-right:1px solid var(--line);padding:16px;overflow:auto;max-height:calc(100vh - 56px);position:sticky;top:0}
+fieldset{border:0;border-top:1px solid var(--line);padding:14px 0 6px}
+fieldset:first-child{border:0;padding-top:0}
+legend{font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--acc);padding-right:8px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+label{display:block;font-size:12px;color:var(--mut)}
+input,select{width:100%;margin-top:3px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;font:14px Onest,sans-serif;background:#f8fafb;color:var(--ink)}
+input:focus,select:focus{outline:2px solid #e8541d55;border-color:var(--acc)}
+.seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:3px}
+.seg button{flex:1;border:0;background:#f8fafb;padding:7px;font:500 13px Onest;cursor:pointer;color:var(--ink)}
+.seg button.on{background:var(--ink);color:#fff}
+.ral{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.ral i{width:26px;height:26px;border-radius:6px;cursor:pointer;border:2px solid transparent;box-shadow:inset 0 0 0 1px #0002}
+.ral i.on{border-color:var(--acc)}
+.op{display:grid;grid-template-columns:46px repeat(4,minmax(0,1fr)) 18px;gap:3px;align-items:end;margin-top:6px}
+.op input,.op select{padding:5px 3px;font-size:12px}
+.op button{border:0;background:none;color:#b33;cursor:pointer;font-size:16px}
+.add{margin-top:8px;width:100%;padding:7px;border:1px dashed var(--acc);color:var(--acc);background:#fff;border-radius:8px;cursor:pointer;font:600 13px Onest}
+main{padding:18px;display:grid;gap:18px;grid-template-columns:1fr 1fr;align-content:start}
+.panel{background:var(--pap);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}
+.panel h2{font-size:15px;display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.panel h2 small{font-weight:400;color:var(--mut);font-size:12px;margin-left:auto}
+#v3d{grid-column:1/-1;height:420px;padding:0;overflow:hidden;position:relative}
+#v3d canvas{display:block;width:100%;height:100%;border-radius:14px}
+#v3d .hint{position:absolute;left:14px;top:12px;font-size:12px;color:var(--mut);background:#ffffffd0;padding:4px 9px;border-radius:7px}
+.fac svg{width:100%;height:auto;display:block;background:repeating-linear-gradient(0deg,#f7f9fb 0 19px,#eef2f5 19px 20px),#f7f9fb;border-radius:8px}
+.spec{grid-column:1/-1}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;font-family:'JetBrains Mono',monospace}
+th{font-family:Onest;font-size:12px;color:var(--mut);font-weight:500;text-align:right}
+th:first-child,td:first-child{text-align:left}
+td .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:5px;box-shadow:inset 0 0 0 1px #0003}
+.tot{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+.tot div{flex:1;min-width:140px;background:#f4f6f8;border-radius:10px;padding:10px 12px}
+.tot b{display:block;font-size:22px;font-family:'JetBrains Mono',monospace}
+.tot span{font-size:12px;color:var(--mut)}
+.cta{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.cta button{padding:11px 18px;border-radius:10px;border:0;font:600 14px Onest;cursor:pointer}
+.cta .p{background:var(--acc);color:#fff}.cta .s{background:#14202b;color:#fff}
+.note{font-size:12px;color:var(--mut);margin-top:10px}
+@media (max-width:980px){.wrap{grid-template-columns:1fr}aside{position:static;max-height:none;border-right:0}main{grid-template-columns:1fr;padding:12px}.steps{display:none}}
+@media print{header,aside,.cta,#v3d{display:none}.wrap{display:block}main{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header><b>Калькулятор сэндвич-панелей</b><span>демо · раскладка, 3D, спецификация</span>
+<nav class="steps"><a href="#s1">1 Геометрия</a><a href="#s2">2 Проемы</a><a href="#s3">3 Панели и RAL</a><a href="#fac">4 Развертки</a><a href="#spec">5 Спецификация</a></nav></header>
+<div class="wrap">
+<aside>
+ <fieldset id="s1"><legend>1 · Здание</legend>
+  <div class="row"><label>Длина, мм<input id="L" type="number" value="24000" step="500"></label><label>Ширина, мм<input id="W" type="number" value="12000" step="500"></label></div>
+  <div class="row"><label>Высота стен, мм<input id="H" type="number" value="6000" step="100"></label><label>Шаг фахверка, мм<input id="col" type="number" value="6000" step="500"></label></div>
+  <label style="margin-top:8px">Кровля<div class="seg" id="roof"><button data-v="gable" class="on">Двускатная</button><button data-v="mono">Односкатная</button></div></label>
+  <div class="row"><label>Угол, °<input id="ang" type="number" value="10" min="3" max="35"></label><label>Свес, мм<input id="ov" type="number" value="300" step="50"></label></div>
+  <div class="row"><label>Цоколь, мм<input id="plinth" type="number" value="500" step="100"></label><label>Макс. длина панели, мм<input id="maxL" type="number" value="12000" step="500"></label></div>
+ </fieldset>
+ <fieldset id="s2"><legend>2 · Проемы</legend>
+  <div class="op" style="font-size:11px;color:var(--mut)"><span>Фасад</span><span>Ш</span><span>В</span><span>Отступ</span><span>От пола</span><span></span></div>
+  <div id="ops"></div><button class="add" id="addop">+ Добавить проем</button>
+ </fieldset>
+ <fieldset id="s3"><legend>3 · Панели</legend>
+  <div class="row"><label>Наполнитель<select id="fill"><option>Минвата</option><option>ПИР</option><option>Пенополистирол</option></select></label><label>Толщина стен<select id="tw"><option>100</option><option selected>150</option><option>200</option></select></label></div>
+  <div class="row"><label>Монтажная ширина<select id="pw"><option>1000</option><option selected>1190</option><option>1150</option></select></label><label>Толщина кровли<select id="tr"><option>150</option><option selected>200</option></select></label></div>
+  <label style="margin-top:8px">Раскладка стен<div class="seg" id="dir"><button data-v="v" class="on">Вертикальная</button><button data-v="h">Горизонтальная</button></div></label>
+  <label style="margin-top:10px">RAL стен</label><div class="ral" data-k="wall"></div>
+  <label style="margin-top:8px">RAL кровли</label><div class="ral" data-k="roof"></div>
+  <label style="margin-top:8px">RAL обрамления / доборов</label><div class="ral" data-k="trim"></div>
+ </fieldset>
+</aside>
+<main>
+ <div class="panel" id="v3d"><div class="hint">3D · вращайте мышью / пальцем</div></div>
+ <div id="fac" style="display:contents"></div>
+ <div class="panel spec" id="spec"></div>
+</main>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const RAL={"9003":"#f4f4f0","7024":"#474a50","5005":"#1e4f8c","3005":"#5e2028","6005":"#1f4a37","1015":"#e6d2b5","8017":"#45322e","7004":"#9b9b9b"};
+const col={wall:"9003",roof:"5005",trim:"7024"};
+let roof="gable",dir="v";
+let ops=[{f:"A",w:4000,h:4500,x:3000,y:0},{f:"A",w:1500,h:1200,x:14000,y:2500},{f:"A",w:1500,h:1200,x:18000,y:2500},{f:"B",w:900,h:2100,x:2000,y:0},{f:"C",w:1500,h:1200,x:6000,y:2500}];
+const $=id=>document.getElementById(id),v=id=>+$(id).value||0;
+document.querySelectorAll(".ral").forEach(r=>{const k=r.dataset.k;Object.entries(RAL).forEach(([n,c])=>{const i=document.createElement("i");i.style.background=c;i.title="RAL "+n;if(col[k]==n)i.className="on";i.onclick=()=>{col[k]=n;r.querySelectorAll("i").forEach(x=>x.classList.toggle("on",x==i));calc()};r.appendChild(i)})});
+function seg(id,set){$(id).querySelectorAll("button").forEach(b=>b.onclick=()=>{$(id).querySelectorAll("button").forEach(x=>x.classList.toggle("on",x==b));set(b.dataset.v);calc()})}
+seg("roof",x=>roof=x);seg("dir",x=>dir=x);
+function drawOps(){$("ops").innerHTML="";ops.forEach((o,i)=>{const d=document.createElement("div");d.className="op";
+ d.innerHTML=`<select>${["A","B","C","D"].map(f=>`<option ${o.f==f?"selected":""}>${f}</option>`).join("")}</select>`+["w","h","x","y"].map(k=>`<input type="number" step="100" value="${o[k]}" data-k="${k}">`).join("")+`<button title="Удалить">×</button>`;
+ d.querySelector("select").onchange=e=>{o.f=e.target.value;calc()};d.querySelectorAll("input").forEach(inp=>inp.oninput=()=>{o[inp.dataset.k]=+inp.value||0;calc()});
+ d.querySelector("button").onclick=()=>{ops.splice(i,1);drawOps();calc()};$("ops").appendChild(d)})}
+$("addop").onclick=()=>{ops.push({f:"B",w:1200,h:1200,x:5000,y:2000});drawOps();calc()};
+document.querySelectorAll("aside input,aside select").forEach(e=>e.addEventListener("input",calc));
+
+// facades: A,C long sides (length L); B,D gable ends (width W)
+function facades(){const L=v("L"),W=v("W"),H=v("H"),t=Math.tan(v("ang")*Math.PI/180);
+ const rise=roof=="gable"?W/2*t:W*t;
+ return[{k:"A",name:"Фасад А (продольный)",len:L,top:x=>roof=="mono"?H+rise:H},
+  {k:"C",name:"Фасад В (продольный)",len:L,top:x=>H},
+  {k:"B",name:"Фасад Б (торец)",len:W,top:x=>roof=="gable"?H+Math.min(x,W-x)*t:H+(W-x)*t},
+  {k:"D",name:"Фасад Г (торец)",len:W,top:x=>roof=="gable"?H+Math.min(x,W-x)*t:H+x*t}]}
+function layout(f){const pw=+$("pw").value,maxL=v("maxL"),pl=v("plinth"),stepC=v("col"),pan=[];
+ if(dir=="v"){for(let x=0;x<f.len-1;x+=pw){const w=Math.min(pw,f.len-x),top=Math.max(f.top(x),f.top(x+w));let y=pl;
+   while(y<top-1){const h=Math.min(maxL,top-y);pan.push({x,y,w,h,slope:f.top(x)!=f.top(x+w)&&y+h>=top-1});y+=h}}}
+ else{const H=f.top(0),Hmin=Math.min(f.top(0),f.top(f.len/2),f.top(f.len));for(let y=pl;y<Hmin-1;y+=pw){const h=Math.min(pw,Hmin-y);let x=0;
+   while(x<f.len-1){let l=Math.min(maxL,f.len-x);if(l<f.len-x){l=Math.floor(l/stepC)*stepC||l}pan.push({x,y,w:l,h});x+=l}}
+   // gable triangle zone: vertical infill
+   if(Math.max(f.top(0),f.top(f.len/2),f.top(f.len))>Hmin+1)for(let x=0;x<f.len-1;x+=pw){const w=Math.min(pw,f.len-x),top=Math.max(f.top(x),f.top(x+w));if(top>Hmin+1)pan.push({x,y:Hmin,w,h:top-Hmin,slope:true})}}
+ return pan}
+let marks={};
+function mark(type,len,wid){const key=type+"|"+Math.round(len)+"|"+wid;if(!marks[key])marks[key]={code:type+"-"+(Object.keys(marks).filter(k=>k.startsWith(type)).length+1),type,len:Math.round(len),wid,n:0};return marks[key]}
+function calc(){marks={};const fs=facades(),out=$("fac");out.innerHTML="";const pw=+$("pw").value;let wallArea=0,opArea=0;
+ fs.forEach(f=>{const pan=layout(f),Hmax=Math.max(...[0,.25,.5,.75,1].map(r=>f.top(f.len*r)));const S=760/Math.max(f.len,Hmax*1.6),ww=f.len*S+60,hh=Hmax*S+50;
+  let g="";const Y=y=>hh-25-y*S,X=x=>30+x*S;
+  g+=`<rect x="${X(0)}" y="${Y(v("plinth"))}" width="${f.len*S}" height="${v("plinth")*S}" fill="#9aa3ab" opacity=".55"/>`;
+  pan.forEach(p=>{const len=dir=="v"||p.slope?p.h:p.w,wd=dir=="v"||p.slope?p.w:p.h;const m=mark("ПС",len,Math.round(wd));m.n++;wallArea+=p.w*p.h/1e6;
+   g+=`<rect x="${X(p.x)}" y="${Y(p.y+p.h)}" width="${p.w*S}" height="${p.h*S}" fill="${RAL[col.wall]}" stroke="#2c3a46" stroke-width=".8"/>`;
+   if(p.w*S>18&&p.h*S>30)g+=`<text x="${X(p.x+p.w/2)}" y="${Y(p.y+p.h/2)}" font-size="${Math.min(10,p.w*S/3.4)}" text-anchor="middle" dominant-baseline="middle" fill="#2c3a46" font-family="JetBrains Mono" ${dir=="v"||p.slope?`transform="rotate(-90 ${X(p.x+p.w/2)} ${Y(p.y+p.h/2)})"`:""}>${m.code}</text>`});
+  // roof line clip
+  let poly=`M${X(0)} ${Y(f.top(0))}`;for(let i=1;i<=40;i++){const x=f.len*i/40;poly+=` L${X(x)} ${Y(f.top(x))}`}
+  g+=`<path d="${poly} L${X(f.len)} 0 L${X(0)} 0Z" fill="#f7f9fb"/><path d="${poly}" fill="none" stroke="${RAL[col.roof]}" stroke-width="3"/>`;
+  ops.filter(o=>o.f==f.k).forEach(o=>{opArea+=o.w*o.h/1e6;g+=`<rect x="${X(o.x)}" y="${Y(o.y+o.h)}" width="${o.w*S}" height="${o.h*S}" fill="#cfe3f3" stroke="${RAL[col.trim]}" stroke-width="2.5"/><text x="${X(o.x+o.w/2)}" y="${Y(o.y+o.h/2)}" font-size="9" text-anchor="middle" fill="#2c3a46" font-family="JetBrains Mono">${o.w}×${o.h}</text>`});
+  g+=`<line x1="${X(0)}" y1="${hh-10}" x2="${X(f.len)}" y2="${hh-10}" stroke="#e8541d"/><text x="${X(f.len/2)}" y="${hh-13}" font-size="10" text-anchor="middle" fill="#e8541d" font-family="JetBrains Mono">${f.len} мм</text>`;
+  const d=document.createElement("div");d.className="panel fac";d.innerHTML=`<h2>${f.name}<small>${pan.length} панелей</small></h2><svg viewBox="0 0 ${ww} ${hh}">${g}</svg>`;out.appendChild(d)});
+ // roof
+ const L=v("L")+2*v("ov"),W=v("W"),ang=v("ang")*Math.PI/180,slopeW=(roof=="gable"?W/2:W)/Math.cos(ang)+v("ov"),nS=roof=="gable"?2:1;let roofArea=0;
+ for(let s=0;s<nS;s++){for(let x=0;x<L-1;x+=1000){const w=Math.min(1000,L-x);let y=0;while(y<slopeW-1){const h=Math.min(v("maxL"),slopeW-y);mark("ПК",h,w).n++;roofArea+=w*h/1e6;y+=h}}}
+ // trims
+ const H=v("H"),per=2*(v("L")+v("W")),opPer=ops.reduce((s,o)=>s+2*(o.w+o.h),0);
+ const dob=[["Угол наружный",4*H/1000*1.05,"м.п."],["Отлив цокольный",per/1000*1.05,"м.п."],[roof=="gable"?"Конёк":"Торцевая планка верх",(roof=="gable"?v("L"):v("L"))/1000*1.05,"м.п."],["Торцевая планка кровли",(roof=="gable"?4:2)*slopeW/1000*1.05,"м.п."],["Обрамление проемов",opPer/1000*1.1,"м.п."],["Саморезы (8 шт/м²)",(wallArea+roofArea)*8,"шт."]];
+ const rows=Object.values(marks).sort((a,b)=>a.type.localeCompare(b.type)||a.code.localeCompare(b.code,undefined,{numeric:true}));
+ $("spec").innerHTML=`<h2>5 · Спецификация раскроя<small>${$("fill").value}, стены ${$("tw").value} мм / кровля ${$("tr").value} мм</small></h2>
+ <table><tr><th>Марка</th><th>Длина, мм</th><th>Ширина, мм</th><th>Кол-во</th><th>Площадь, м²</th><th>Цвет</th></tr>
+ ${rows.map(r=>`<tr><td>${r.code}</td><td>${r.len}</td><td>${r.wid}</td><td>${r.n}</td><td>${(r.len*r.wid*r.n/1e6).toFixed(2)}</td><td><span class="sw" style="background:${RAL[r.type=="ПК"?col.roof:col.wall]}"></span>${r.type=="ПК"?col.roof:col.wall}</td></tr>`).join("")}
+ </table><h2 style="margin-top:16px">Доборные элементы<small>RAL ${col.trim}, коэффициенты запаса условные</small></h2>
+ <table><tr><th>Элемент</th><th>Кол-во</th><th>Ед.</th></tr>${dob.map(d=>`<tr><td>${d[0]}</td><td>${d[1].toFixed(d[2]=="шт."?0:1)}</td><td>${d[2]}</td></tr>`).join("")}</table>
+ <div class="tot"><div><span>Стены (брутто)</span><b>${wallArea.toFixed(1)} м²</b></div><div><span>Проемы</span><b>${opArea.toFixed(1)} м²</b></div><div><span>Кровля</span><b>${roofArea.toFixed(1)} м²</b></div><div><span>Марок панелей</span><b>${rows.length}</b></div></div>
+ <div class="cta"><button class="p" onclick="window.print()">Скачать PDF</button><button class="s" onclick="alert('В рабочей версии: имя, телефон, e-mail + PDF уходят на почту / в CRM')">Отправить заявку</button></div>
+ <p class="note">Демо: правила подрезки, зазоры и коэффициенты доборов условные - в рабочей версии подставляются из вашей таблицы. Панели в зонах проемов в рабочей версии режутся и маркируются отдельно.</p>`;
+ build3d()}
+// 3D
+let R,S,C,grp,drag=null,rot={x:.45,y:-.7},dist=1;
+function init3d(){const el=$("v3d");R=new THREE.WebGLRenderer({antialias:true,alpha:true});R.setPixelRatio(Math.min(devicePixelRatio,2));el.appendChild(R.domElement);
+ S=new THREE.Scene();C=new THREE.PerspectiveCamera(35,1,.1,500);S.add(new THREE.HemisphereLight(0xffffff,0x8899aa,.85));const d=new THREE.DirectionalLight(0xffffff,.7);d.position.set(30,50,20);S.add(d);
+ const gr=new THREE.Mesh(new THREE.CircleGeometry(60,48),new THREE.MeshLambertMaterial({color:0xdfe5ea}));gr.rotation.x=-Math.PI/2;S.add(gr);
+ el.onpointerdown=e=>{drag=[e.clientX,e.clientY];el.setPointerCapture(e.pointerId)};el.onpointerup=()=>drag=null;
+ el.onpointermove=e=>{if(!drag)return;rot.y+=(e.clientX-drag[0])*.006;rot.x=Math.max(.05,Math.min(1.3,rot.x+(e.clientY-drag[1])*.004));drag=[e.clientX,e.clientY]};
+ el.onwheel=e=>{e.preventDefault();dist=Math.max(.5,Math.min(2.2,dist*(1+e.deltaY*.001)))};
+ const rs=()=>{const w=el.clientWidth,h=el.clientHeight;R.setSize(w,h);C.aspect=w/h;C.updateProjectionMatrix()};addEventListener("resize",rs);rs();
+ (function loop(){if(!drag)rot.y+=.0015;const L=v("L")/1000,r=Math.max(L,v("W")/1000)*1.5*dist;C.position.set(Math.sin(rot.y)*Math.cos(rot.x)*r,Math.sin(rot.x)*r+2,Math.cos(rot.y)*Math.cos(rot.x)*r);C.lookAt(0,v("H")/2000,0);R.render(S,C);requestAnimationFrame(loop)})()}
+function build3d(){if(!R)return;if(grp)S.remove(grp);grp=new THREE.Group();const L=v("L")/1000,W=v("W")/1000,H=v("H")/1000,t=Math.tan(v("ang")*Math.PI/180),ov=v("ov")/1000,pl=v("plinth")/1000;
+ const mw=new THREE.MeshLambertMaterial({color:RAL[col.wall],side:THREE.DoubleSide}),mr=new THREE.MeshLambertMaterial({color:RAL[col.roof],side:THREE.DoubleSide}),mp=new THREE.MeshLambertMaterial({color:0x8d969e}),mo=new THREE.MeshLambertMaterial({color:0x9ec3e0}),mt=new THREE.MeshLambertMaterial({color:RAL[col.trim]});
+ // walls as extruded profile along L
+ const sh=new THREE.Shape();sh.moveTo(-W/2,0);sh.lineTo(W/2,0);if(roof=="gable"){sh.lineTo(W/2,H);sh.lineTo(0,H+W/2*t);sh.lineTo(-W/2,H)}else{sh.lineTo(W/2,H);sh.lineTo(-W/2,H+W*t)}sh.lineTo(-W/2,0);
+ const body=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:L,bevelEnabled:false}),mw);body.position.z=-L/2;grp.add(body);
+ const pb=new THREE.Mesh(new THREE.BoxGeometry(W+.02,pl,L+.02),mp);pb.position.y=pl/2;grp.add(pb);
+ // ribs (vertical panel joints)
+ const pw=+$("pw").value/1000,rib=new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.12});
+ if(dir=="v")for(let z=-L/2;z<=L/2;z+=pw){[-1,1].forEach(s=>{const hh=roof=="mono"&&s<0?H+W*t:H;const m=new THREE.Mesh(new THREE.PlaneGeometry(.02,hh),rib);m.position.set(s*(W/2+.003),hh/2,z);m.rotation.y=Math.PI/2;grp.add(m)})}
+ else for(let y=pl;y<H;y+=pw){[-1,1].forEach(s=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(L,.02),rib);m.position.set(s*(W/2+.003),y,0);m.rotation.y=Math.PI/2;grp.add(m)})}
+ // roof
+ const slope=(a,len,cx,cy,sgn)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(len+ov,.12,L+2*ov),mr);m.position.set(cx,cy,0);m.rotation.z=sgn*a;grp.add(m)};const a=Math.atan(t);
+ if(roof=="gable"){const len=W/2/Math.cos(a);slope(a,len,-W/4-ov/2*Math.cos(a)/2,H+W/4*t+.06,1);slope(a,len,W/4+ov/2*Math.cos(a)/2,H+W/4*t+.06,-1)}else{slope(a,W/Math.cos(a),0,H+W/2*t+.06,1)}
+ // openings
+ ops.forEach(o=>{const w=o.w/1000,h=o.h/1000,x=o.x/1000,y=o.y/1000;let m=new THREE.Mesh(new THREE.BoxGeometry(w,h,.05),mo),fr=new THREE.Mesh(new THREE.BoxGeometry(w+.16,h+.16,.03),mt);
+  [m,fr].forEach(q=>{if(o.f=="A"){q.position.set(W/2+.02,y+h/2,-L/2+x+w/2);q.rotation.y=Math.PI/2}else if(o.f=="C"){q.position.set(-W/2-.02,y+h/2,L/2-x-w/2);q.rotation.y=Math.PI/2}else if(o.f=="B"){q.position.set(W/2-x-w/2,y+h/2,L/2+.02)}else{q.position.set(-W/2+x+w/2,y+h/2,-L/2-.02)}grp.add(q)});fr.position.multiplyScalar(1)});
+ S.add(grp)}
+drawOps();init3d();calc();
+</script>
+</body>
+</html>
